@@ -2,47 +2,57 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactKonva from 'react-konva'
 import './index.css'
+const {Layer, Rect, Stage, Group} = ReactKonva
 
-const {Layer, Rect, Stage, Group} = ReactKonva;
-
-// try drag& drop rectangle
-class MyRect extends React.Component {
-    changeSize() {
-        this.refs.rect.to({
-            scaleX: Math.random() + 0.8,
-            scaleY: Math.random() + 0.8,
-            duration: 0.2
-        });
-    }
-    render() {
-        return (
-            <Group>
-                <Rect
-                    ref="rect"
-                    width="50"
-                    height="50"
-                    fill="green"
-                    draggable="true"
-                    onDragEnd={this.changeSize.bind(this)}
-                    onDragStart={this.changeSize.bind(this)}
-                />
-          </Group>
-        );
-    }
+let appState = {
+  x: 0,
+  y: 0
 }
 
-function App() {
-    return (
-      <Stage width={700} height={700}>
-        <Layer>
-            <MyRect/>
-        </Layer>
-      </Stage>
-    );
+function checkArrow (event) {
+  const keyValue = event.keyCode
+  const left = 37
+  const up = 38
+  const right = 39
+  const down = 40
+
+  if (keyValue === left) appState.x -= 10
+  if (keyValue === right) appState.x += 10
+  if (keyValue === up) appState.y -= 10
+  if (keyValue === down) appState.y += 10
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+window.addEventListener('keydown', checkArrow)
 
+function MyRect (state) {
+  return (
+    <Group>
+      <Rect x={state.x}
+        y={state.y}
+        width='50'
+        height='50'
+        fill='grey'
+      />
+    </Group>
+  )
+}
+
+function App (state) {
+  return (
+    <Stage width={300} height={300}>
+      <Layer>
+        {MyRect(state)}
+      </Layer>
+    </Stage>
+  )
+}
+
+function renderNow () {
+  ReactDOM.render(App(appState), document.getElementById('root'))
+
+  window.requestAnimationFrame(renderNow)
+}
+window.requestAnimationFrame(renderNow)
 
 // class App extends React.Component {
 //   componentDidMount () {
